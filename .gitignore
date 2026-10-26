@@ -1,0 +1,6 @@
+# File sementara Excel/Word saat file sedang dibuka
+~$*
+# File sementara lain
+*.tmp
+Thumbs.db
+desktop.ini
