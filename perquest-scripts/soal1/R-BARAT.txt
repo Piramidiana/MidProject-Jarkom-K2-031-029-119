@@ -1,0 +1,20 @@
+! Soal 1 - Konfigurasi IP R-BARAT (K2, skema CIDR)
+! Modul: HWIC-2T di slot 3 (Serial0/3/x). S0/3/0 = jalur ke router atas (sisi DTE).
+enable
+configure terminal
+hostname R-BARAT
+no ip domain-lookup
+interface g0/0
+ description LAN WiFi Publik Barat
+ ip address 10.16.64.1 255.255.224.0
+ no shutdown
+interface g0/1
+ description LAN Puskesmas dan Sekolah Barat
+ ip address 10.16.96.1 255.255.255.0
+ no shutdown
+interface s0/3/0
+ description L5 ke R-PUSAT
+ ip address 10.16.97.2 255.255.255.252
+ no shutdown
+end
+copy running-config startup-config

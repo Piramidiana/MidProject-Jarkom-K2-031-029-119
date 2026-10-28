@@ -1,0 +1,16 @@
+! Soal 1 - Konfigurasi IP R-ISP (K2)
+! R-ISP sengaja TIDAK diberi rute ke alamat privat 10.x (aturan soal 5)
+enable
+configure terminal
+hostname R-ISP
+no ip domain-lookup
+interface g0/0
+ description Link ke R-PUSAT
+ ip address 203.0.113.9 255.255.255.252
+ no shutdown
+interface g0/1
+ description LAN Server Internet
+ ip address 8.8.8.1 255.255.255.0
+ no shutdown
+end
+copy running-config startup-config

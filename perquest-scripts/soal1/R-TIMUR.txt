@@ -1,0 +1,20 @@
+! Soal 1 - Konfigurasi IP R-TIMUR (K2, skema CIDR)
+! Modul: HWIC-2T di slot 3 (Serial0/3/x). S0/3/0 = jalur ke router atas (sisi DTE).
+enable
+configure terminal
+hostname R-TIMUR
+no ip domain-lookup
+interface g0/0
+ description LAN WiFi Publik Timur
+ ip address 10.16.128.1 255.255.224.0
+ no shutdown
+interface g0/1
+ description LAN Sensor Banjir Timur
+ ip address 10.16.160.1 255.255.252.0
+ no shutdown
+interface s0/3/0
+ description L4 ke R-PUSAT
+ ip address 10.16.164.2 255.255.255.252
+ no shutdown
+end
+copy running-config startup-config

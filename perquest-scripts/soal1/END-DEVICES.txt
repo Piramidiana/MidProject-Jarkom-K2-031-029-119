@@ -1,0 +1,24 @@
+Soal 1 - Pengaturan perangkat akhir (lewat GUI Packet Tracer)
+
+SERVER (IP statis, Desktop > IP Configuration > Static)
+- SRV-INTERNET   8.8.8.8      255.255.255.0    gw 8.8.8.1      (R-ISP G0/1)
+- SRV-BALAIKOTA  10.17.8.2    255.255.255.224  gw 10.17.8.1    (R-PUSAT G0/2)
+- SRV-DC         10.16.32.2   255.255.255.0    gw 10.16.32.1   (R-DC G0/1)
+  DNS server dikosongkan dulu; diisi Ronnin di soal 8.
+
+PERANGKAT PENGGUNA (Desktop > IP Configuration > DHCP; IP diberikan di soal 4)
+- PC-PEGAWAI-BK, PC-CCTV-KOTA, PC-PUSKESMAS-BARAT, PC-SENSOR-UTARA,
+  PC-BANJIR-TIMUR, PC-PJU-SELATAN, PC-SCADA-PELABUHAN, PC-KANTOR-PELABUHAN
+- LAPTOP-WIFI-BARAT/UTARA/TIMUR/SELATAN (modul diganti WPC300N, interface Wireless0)
+
+ACCESS POINT (AccessPoint-PT, Config > Port 1, Authentication Disabled)
+- AP-WIFI-BARAT    SSID WiFi-Publik-Barat
+- AP-WIFI-UTARA    SSID WiFi-Publik-Utara
+- AP-WIFI-TIMUR    SSID WiFi-Publik-Timur
+- AP-WIFI-SELATAN  SSID WiFi-Publik-Selatan
+Laptop memakai SSID yang sama dengan AP wilayahnya (Config > Wireless0).
+
+KABEL
+- Router ke router (serial): Serial DCE, router atas diklik dulu (sisi DCE + clock rate).
+- R-PUSAT G0/0 ke R-ISP G0/0: Copper Cross-Over.
+- Router G0/x ke switch Gig0/1, perangkat Fa0 ke switch Fa0/1, switch Fa0/1 ke AP Port 0: Copper Straight-Through.

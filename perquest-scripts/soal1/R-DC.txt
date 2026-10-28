@@ -1,0 +1,20 @@
+! Soal 1 - Konfigurasi IP R-DC (K2, skema CIDR)
+! Modul: HWIC-2T di slot 3 (Serial0/3/x). S0/3/0 = jalur ke router atas (sisi DTE). S0/3/1 cadangan untuk L7 (soal 7).
+enable
+configure terminal
+hostname R-DC
+no ip domain-lookup
+interface g0/0
+ description LAN CCTV Kota
+ ip address 10.16.0.1 255.255.224.0
+ no shutdown
+interface g0/1
+ description LAN Server dan Storage DC
+ ip address 10.16.32.1 255.255.255.0
+ no shutdown
+interface s0/3/0
+ description L1 ke R-PUSAT
+ ip address 10.16.33.2 255.255.255.252
+ no shutdown
+end
+copy running-config startup-config

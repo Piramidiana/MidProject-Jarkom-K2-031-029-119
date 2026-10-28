@@ -1,0 +1,25 @@
+! Soal 1 - Konfigurasi IP R-UTARA (K2, skema CIDR)
+! Modul: HWIC-2T di slot 2 dan 3. S0/3/0 = ke R-PUSAT (DTE), S0/2/0 = L6 ke R-PELABUHAN (DCE), S0/2/1 cadangan L7.
+enable
+configure terminal
+hostname R-UTARA
+no ip domain-lookup
+interface g0/0
+ description LAN WiFi Publik Utara
+ ip address 10.18.0.1 255.255.192.0
+ no shutdown
+interface g0/1
+ description LAN Sensor Lalu Lintas Utara
+ ip address 10.18.128.1 255.255.254.0
+ no shutdown
+interface s0/3/0
+ description L2 ke R-PUSAT
+ ip address 10.18.130.2 255.255.255.252
+ no shutdown
+interface s0/2/0
+ description L6 ke R-PELABUHAN
+ ip address 10.18.96.129 255.255.255.252
+ clock rate 64000
+ no shutdown
+end
+copy running-config startup-config
