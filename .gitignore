@@ -3,4 +3,5 @@
 # File sementara lain
 *.tmp
 Thumbs.db
-desktop.iniClaude outputs/
+desktop.ini
+Claude outputs/
