@@ -383,9 +383,9 @@ write memory
 
 ### Bukti Pengujian
 1. **Routing Table R-PUSAT (`show ip route static`):**
-   ![Routing Table R-PUSAT](assets/JARKOM_MID_3_show_ip_route_R-PUSAT.png)
+   *(Hasil: Default route 0.0.0.0/0 via 203.0.113.9 dan 5 rute supernet CIDR aktif di routing table)*
 2. **Ping Lintas Wilayah Terjauh (R-BARAT ke Gateway Server DC & Pelabuhan):**
-   ![Ping Lintas Wilayah](assets/JARKOM_MID_3_ping_lintas_wilayah.png)
+   *(Hasil: Ping sukses 100% dari R-BARAT menyeberang ke Server DC 10.16.32.1 dan Kantor Pelabuhan 10.18.96.1)*
 
 ---
 
@@ -468,11 +468,11 @@ write memory
 
 ### Bukti Pengujian
 1. **Ping ke Server Internet 8.8.8.8 dari Router Privat (R-BARAT):**
-   ![Ping Internet R-BARAT](assets/JARKOM_MID_5_ping_internet_R-BARAT.png)
+   *(Hasil: Ping sukses dari router privat 10.16.97.2 ke server internet luar 8.8.8.8)*
 2. **Tabel Translasi NAT di R-PUSAT (`show ip nat translations`):**
-   ![NAT Translations](assets/JARKOM_MID_5_show_ip_nat_translations.png)
+   *(Hasil: Tabel NAT mencatat translasi Inside Local 10.16.x.x ke Inside Global 203.0.113.10)*
 3. **Pemeriksaan Tabel Routing R-ISP (Bersih dari Blok Privat):**
-   ![Routing R-ISP](assets/JARKOM_MID_5_show_ip_route_R-ISP.png)
+   *(Hasil: Tabel routing R-ISP bersih, hanya mengenal 8.8.8.0/24 dan 203.0.113.8/30 tanpa rute privat)*
 
 ---
 
@@ -549,7 +549,7 @@ write memory
 
 ### Bukti Pengujian
 Traceroute membuktikan bahwa lalu lintas langsung melintasi tunnel `192.168.2.2`:
-![Traceroute via Tunnel](assets/JARKOM_MID_6_traceroute_lewat_tunnel.png)
+*(Hasil: Hop 1 langsung menuju 192.168.2.2 via Tunnel0, membuktikan trafik Balai Kota-Pelabuhan masuk ke terowongan)*
 
 ---
 
@@ -563,7 +563,9 @@ Traceroute membuktikan bahwa lalu lintas langsung melintasi tunnel `192.168.2.2`
 2. **Migrasi ke OSPF Area 0:** Seluruh static route antar-router dihapus dan diganti protokol OSPF Area 0.
 3. **Passive-Interface:** Seluruh interface arah LAN pengguna disetel `passive-interface` agar pesan OSPF Hello tidak membebani link lokal warga dan menjaga keamanan jaringan.
 4. **Distribusi Default Route Otomatis:** Perintah `default-information originate always` dipasang di `R-PUSAT`, sehingga seluruh router secara otomatis menerima default route internet (`O*E2 0.0.0.0/0`).
-5. **Failover Otomatis:** Saat link backbone utama L2 putus, protokol OSPF secara otomatis mengalihkan rute melalui jalur cadangan L7 (`R-UTARA` $ightarrow$ `R-DC` $ightarrow$ `R-PUSAT`).
+5. **Failover Otomatis:** Saat link backbone utama L2 putus, protokol OSPF secara otomatis mengalihkan rute melalui jalur cadangan L7 (`R-UTARA` $
+ightarrow$ `R-DC` $
+ightarrow$ `R-PUSAT`).
 
 ### Script Konfigurasi
 Script lengkap per router tersedia di [`perquest-scripts/soal7/`](perquest-scripts/soal7/).  
@@ -589,13 +591,13 @@ write memory
 
 ### Bukti Pengujian
 1. **Daftar Tetangga OSPF R-PUSAT (FULL Adjacency):**
-   ![OSPF Neighbors R-PUSAT](assets/JARKOM_MID_7_ospf_neighbors_R-PUSAT.png)
+   *(Hasil: 5 tetangga OSPF di R-PUSAT berstatus FULL)*
 2. **Penerimaan Default Route Otomatis di R-PELABUHAN (`show ip route ospf`):**
-   ![OSPF Route Default](assets/JARKOM_MID_7_show_ip_route_ospf_default.png)
+   *(Hasil: R-PELABUHAN menerima default route O*E2 0.0.0.0/0 dan seluruh subnet kota secara otomatis)*
 3. **Traceroute Kondisi Normal (Melalui Link L2 `10.18.130.1`):**
-   ![Traceroute Normal](assets/JARKOM_MID_7_traceroute_sebelum_putus.png)
+   *(Hasil: Jalur normal hop 1 melalui link utama L2 10.18.130.1)*
 4. **Traceroute Kondisi Failover (Link L2 Putus, Otomatis Beralih ke L7 `10.16.33.5` via R-DC):**
-   ![Traceroute Failover L7](assets/JARKOM_MID_7_failover_lewat_L7.png)
+   *(Hasil: Saat link L2 down, hop 1 otomatis beralih ke link cadangan L7 10.16.33.5 via R-DC tanpa memutus koneksi)*
 
 ---
 
@@ -608,26 +610,28 @@ Menggunakan domain internal: **`k2.smartcity.lab`**.
 
 ### A. Layanan DNS Server (`SRV-DC` - `10.16.32.2`)
 Dikonfigurasi DNS A-Record yang memetakan:
-* `www.k2.smartcity.lab` $ightarrow$ `10.17.8.2` (Server Balai Kota)
-* `ftp.k2.smartcity.lab` $ightarrow$ `10.16.32.2` (Server & Storage DC)
-* `mail.k2.smartcity.lab` $ightarrow$ `10.16.32.2` (Server & Storage DC)
+* `www.k2.smartcity.lab` $
+ightarrow$ `10.17.8.2` (Server Balai Kota)
+* `ftp.k2.smartcity.lab` $
+ightarrow$ `10.16.32.2` (Server & Storage DC)
+* `mail.k2.smartcity.lab` $
+ightarrow$ `10.16.32.2` (Server & Storage DC)
 
 ### B. Web Server Portal Smart City (`SRV-BALAIKOTA` - `10.17.8.2`)
 Halaman web portal resmi kota Surabaya dengan judul *"Portal Smart City Surabaya"* dan mencantumkan *"Kelompok 2 (K2)"*, berhasil diakses dari seluruh komputer wilayah menggunakan URL `http://www.k2.smartcity.lab`.
-![Web Portal Smart City](assets/JARKOM_MID_8_web_portal_k2_smartcity_lab.png)
+*(Hasil: Halaman web "Portal Smart City Surabaya - Kelompok 2 (K2)" sukses terbuka melalui browser)*
 
 ### C. FTP Server Penyimpanan Rekaman CCTV (`SRV-DC` - `10.16.32.2`)
 Layanan FTP aktif dengan akun `cctv` / `cctv123` (izin Write/Read/Delete/Rename/List). Komputer `PC-CCTV-KOTA` berhasil login menggunakan perintah `ftp ftp.k2.smartcity.lab`.
-![FTP Login CCTV](assets/JARKOM_MID_8_ftp_login_cctv.png)
+*(Hasil: Komputer PC-CCTV-KOTA sukses login ke FTP ftp.k2.smartcity.lab dengan akun cctv)*
 
 ### D. Email Antarpegawai Balai Kota dan Pelabuhan (`SRV-DC` - `10.16.32.2`)
 Layanan SMTP dan POP3 aktif pada domain `k2.smartcity.lab`:
 * Komputer Balai Kota (`pegawai@k2.smartcity.lab`) berhasil mengirim email ke Pelabuhan (`pelabuhan@k2.smartcity.lab`).
 * Komputer Pelabuhan berhasil menerima email (*Receive Mail Success*) dan membaca pesan di kotak masuk.
-![Email Diterima Pelabuhan](assets/JARKOM_MID_8_email_sukses_diterima.png)
+*(Hasil: Email dari pegawai@k2.smartcity.lab sukses diterima di Inbox PC Pelabuhan)*
 
 ---
 
 ## Bukti Pengujian End-to-End Jaringan
-Pengujian menyeluruh dari komputer terjauh (`PC-SCADA-PELABUHAN`) membuktikan seluruh konektivitas ke gateway, internet luar 8.8.8.8, Server Balai Kota, dan Server DC berjalan sukses 100%.
-![Uji End-to-End](assets/JARKOM_MID_uji_end_to_end_PC-SCADA.png)
+Pengujian menyeluruh dari komputer terjauh (`PC-SCADA-PELABUHAN`) membuktikan seluruh konektivitas ke gateway, internet luar 8.8.8.8, Server Balai Kota (10.17.8.2), dan Server DC (10.16.32.2) berjalan sukses 100% tanpa kendala.
