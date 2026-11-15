@@ -635,3 +635,6 @@ Layanan SMTP dan POP3 aktif pada domain `k2.smartcity.lab`:
 
 ## Bukti Pengujian End-to-End Jaringan
 Pengujian menyeluruh dari komputer terjauh (`PC-SCADA-PELABUHAN`) membuktikan seluruh konektivitas ke gateway, internet luar 8.8.8.8, Server Balai Kota (10.17.8.2), dan Server DC (10.16.32.2) berjalan sukses 100% tanpa kendala.
+
+# Video Demo Kelompok-2
+
