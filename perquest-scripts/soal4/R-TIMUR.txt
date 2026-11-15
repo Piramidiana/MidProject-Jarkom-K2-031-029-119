@@ -1,0 +1,14 @@
+enable
+configure terminal
+ip dhcp excluded-address 10.16.128.1
+ip dhcp excluded-address 10.16.160.1
+ip dhcp pool POOL-WIFI-TIMUR
+ network 10.16.128.0 255.255.224.0
+ default-router 10.16.128.1
+ dns-server 10.16.32.2
+ip dhcp pool POOL-BANJIR
+ network 10.16.160.0 255.255.252.0
+ default-router 10.16.160.1
+ dns-server 10.16.32.2
+end
+write memory

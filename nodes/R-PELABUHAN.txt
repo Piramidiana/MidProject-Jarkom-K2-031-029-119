@@ -1,0 +1,48 @@
+hostname R-PELABUHAN
+!
+interface GigabitEthernet0/0
+ description LAN-Sensor-dan-SCADA
+ ip address 10.18.64.1 255.255.224.0
+ no shutdown
+!
+interface GigabitEthernet0/1
+ description LAN-Kantor-Pelabuhan
+ ip address 10.18.96.1 255.255.255.128
+ no shutdown
+!
+interface Serial0/3/0
+ description L6-ke-R-UTARA
+ ip address 10.18.96.130 255.255.255.252
+ no shutdown
+!
+interface Tunnel0
+ description GRE-Tunnel-ke-R-PUSAT
+ ip address 192.168.2.2 255.255.255.252
+ tunnel source Serial0/3/0
+ tunnel destination 10.18.130.1
+ tunnel protection ipsec profile IPSEC-TUNNEL
+!
+ip dhcp excluded-address 10.18.64.1
+ip dhcp excluded-address 10.18.96.1
+ip dhcp pool POOL-SCADA
+ network 10.18.64.0 255.255.224.0
+ default-router 10.18.64.1
+ dns-server 10.16.32.2
+ip dhcp pool POOL-KANTOR-PELABUHAN
+ network 10.18.96.0 255.255.255.128
+ default-router 10.18.96.1
+ dns-server 10.16.32.2
+!
+ip route 0.0.0.0 0.0.0.0 10.18.96.129
+ip route 10.17.0.0 255.255.248.0 192.168.2.1
+ip route 10.17.8.0 255.255.255.224 192.168.2.1
+!
+crypto isakmp policy 10
+ encr aes
+ hash sha
+ authentication pre-share
+ group 2
+crypto isakmp key jarkom123 address 10.18.130.1
+crypto ipsec transform-set TS esp-aes esp-sha-hmac
+crypto ipsec profile IPSEC-TUNNEL
+ set transform-set TS

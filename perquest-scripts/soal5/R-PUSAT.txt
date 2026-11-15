@@ -1,0 +1,23 @@
+enable
+configure terminal
+access-list 1 permit 10.16.0.0 0.3.255.255
+access-list 1 permit 10.0.0.0 0.255.255.255
+ip nat inside source list 1 interface GigabitEthernet0/0 overload
+interface GigabitEthernet0/0
+ ip nat outside
+interface GigabitEthernet0/1
+ ip nat inside
+interface GigabitEthernet0/2
+ ip nat inside
+interface Serial0/1/0
+ ip nat inside
+interface Serial0/1/1
+ ip nat inside
+interface Serial0/2/0
+ ip nat inside
+interface Serial0/2/1
+ ip nat inside
+interface Serial0/3/0
+ ip nat inside
+end
+write memory

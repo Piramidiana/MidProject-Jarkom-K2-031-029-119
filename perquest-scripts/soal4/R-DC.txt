@@ -1,0 +1,6 @@
+enable
+configure terminal
+interface GigabitEthernet0/0
+ ip helper-address 10.16.32.2
+end
+write memory

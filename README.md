@@ -334,24 +334,300 @@ Rincian lengkap (20 baris) ada di sheet **Revisi**. Ringkasannya:
 
 ## Soal 3 – Static Routing
 
-_Belum dikerjakan._
+> Dikerjakan oleh: Muhammad Rifqi Fathurrahman (5027251029)  
+> File: [`artefacts/K2_CIDR.pkt`](artefacts/K2_CIDR.pkt) · Script: [`perquest-scripts/soal3/`](perquest-scripts/soal3/)
+
+### Penjelasan Desain
+Routing statik menerapkan konsep hirarki pohon (Supernetting CIDR) sesuai ketentuan soal:
+1. **Aturan Default Route:** Hanya boleh mengarah ke router di atasnya / keluar.
+   - Router cabang (`R-DC`, `R-BARAT`, `R-TIMUR`, `R-SELATAN`) mengarahkan default route `0.0.0.0/0` ke `R-PUSAT`.
+   - `R-PELABUHAN` mengarahkan default route `0.0.0.0/0` ke router di atasnya, yaitu `R-UTARA` (`10.18.96.129`).
+   - `R-UTARA` mengarahkan default route `0.0.0.0/0` ke router di atasnya, yaitu `R-PUSAT` (`10.18.130.1`).
+   - `R-PUSAT` mengarahkan default route `0.0.0.0/0` keluar ke internet melalui `R-ISP` (`203.0.113.9`).
+2. **Rute Masuk ke Jaringan Bawah:**
+   - `R-UTARA` memiliki rute statik supernet ke LAN Pelabuhan (`10.18.64.0/18` via `10.18.96.130`).
+   - `R-PUSAT` memiliki 5 rute supernet CIDR ringkas ke seluruh wilayah bawah:
+     * Sisi R-DC: `10.16.0.0/18` via `10.16.33.2`
+     * Sisi R-BARAT: `10.16.64.0/18` via `10.16.97.2`
+     * Sisi R-TIMUR: `10.16.128.0/18` via `10.16.164.2`
+     * Sisi R-SELATAN: `10.16.192.0/18` via `10.16.224.130`
+     * Sisi R-UTARA & Pelabuhan: `10.18.0.0/16` via `10.18.130.2`
+
+### Script Konfigurasi
+* **R-PUSAT** (`perquest-scripts/soal3/R-PUSAT.txt`):
+```text
+enable
+configure terminal
+ip route 0.0.0.0 0.0.0.0 203.0.113.9
+ip route 10.16.0.0 255.255.192.0 10.16.33.2
+ip route 10.16.64.0 255.255.192.0 10.16.97.2
+ip route 10.16.128.0 255.255.192.0 10.16.164.2
+ip route 10.16.192.0 255.255.192.0 10.16.224.130
+ip route 10.18.0.0 255.255.0.0 10.18.130.2
+end
+write memory
+```
+
+* **R-UTARA** (`perquest-scripts/soal3/R-UTARA.txt`):
+```text
+enable
+configure terminal
+ip route 0.0.0.0 0.0.0.0 10.18.130.1
+ip route 10.18.64.0 255.255.192.0 10.18.96.130
+end
+write memory
+```
+
+* **Router Cabang (R-DC, R-BARAT, R-TIMUR, R-SELATAN, R-PELABUHAN):**
+  Menggunakan default route mengarah ke router atas masing-masing. Script lengkap ada di folder [`perquest-scripts/soal3/`](perquest-scripts/soal3/).
+
+### Bukti Pengujian
+1. **Routing Table R-PUSAT (`show ip route static`):**
+   ![Routing Table R-PUSAT](assets/JARKOM_MID_3_show_ip_route_R-PUSAT.png)
+2. **Ping Lintas Wilayah Terjauh (R-BARAT ke Gateway Server DC & Pelabuhan):**
+   ![Ping Lintas Wilayah](assets/JARKOM_MID_3_ping_lintas_wilayah.png)
+
+---
 
 ## Soal 4 – DHCP
 
-_Belum dikerjakan._
+> Dikerjakan oleh: Ronnin Raditya Putra Partono (5027251119) & Muhammad Rifqi Fathurrahman  
+> File: [`artefacts/K2_CIDR.pkt`](artefacts/K2_CIDR.pkt) · Script: [`perquest-scripts/soal4/`](perquest-scripts/soal4/)
+
+### Penjelasan Desain
+1. **Server dan Interface Router:** Menggunakan IP statis sesuai tabel pengalamatan.
+2. **Perangkat Pengguna:** Memperoleh IP secara dinamis melalui DHCP Pool di masing-masing router wilayah, lengkap dengan default gateway dan DNS Server (`10.16.32.2`), dengan IP gateway di-exclude agar tidak bentrok.
+3. **Khusus Subnet CCTV Kota:** Dilayani oleh Server DHCP mandiri di LAN Server & Storage DC (`10.16.32.2`), bukan dari router. Pada interface `GigabitEthernet0/0` router `R-DC` dipasang `ip helper-address 10.16.32.2` untuk meneruskan siaran DHCP request.
+
+### Script Konfigurasi
+* **R-DC (DHCP Relay untuk CCTV)** (`perquest-scripts/soal4/R-DC.txt`):
+```text
+enable
+configure terminal
+interface GigabitEthernet0/0
+ ip helper-address 10.16.32.2
+end
+write memory
+```
+
+* **Contoh DHCP Pool di Router Cabang (R-PELABUHAN)** (`perquest-scripts/soal4/R-PELABUHAN.txt`):
+```text
+enable
+configure terminal
+ip dhcp excluded-address 10.18.64.1
+ip dhcp excluded-address 10.18.96.1
+ip dhcp pool POOL-SCADA
+ network 10.18.64.0 255.255.224.0
+ default-router 10.18.64.1
+ dns-server 10.16.32.2
+ip dhcp pool POOL-KANTOR-PELABUHAN
+ network 10.18.96.0 255.255.255.128
+ default-router 10.18.96.1
+ dns-server 10.16.32.2
+end
+write memory
+```
+
+---
 
 ## Soal 5 – NAT
 
-_Belum dikerjakan._
+> Dikerjakan oleh: Muhammad Rifqi Fathurrahman (5027251029)  
+> File: [`artefacts/K2_CIDR.pkt`](artefacts/K2_CIDR.pkt) · Script: [`perquest-scripts/soal5/`](perquest-scripts/soal5/)
+
+### Penjelasan Desain
+Seluruh perangkat Smart City Surabaya menggunakan alamat privat blok `10.16.0.0/14`. Untuk dapat mengakses internet publik (Server `8.8.8.8`), router `R-PUSAT` dikonfigurasi dengan **PAT (Port Address Translation) / NAT Overload** menggunakan satu IP publik interface `GigabitEthernet0/0` (`203.0.113.10`). Router `R-ISP` sama sekali tidak memiliki rute ke blok privat.
+
+### Script Konfigurasi
+* **R-PUSAT** (`perquest-scripts/soal5/R-PUSAT.txt`):
+```text
+enable
+configure terminal
+access-list 1 permit 10.16.0.0 0.3.255.255
+access-list 1 permit 10.0.0.0 0.255.255.255
+ip nat inside source list 1 interface GigabitEthernet0/0 overload
+interface GigabitEthernet0/0
+ ip nat outside
+interface GigabitEthernet0/1
+ ip nat inside
+interface GigabitEthernet0/2
+ ip nat inside
+interface Serial0/1/0
+ ip nat inside
+interface Serial0/1/1
+ ip nat inside
+interface Serial0/2/0
+ ip nat inside
+interface Serial0/2/1
+ ip nat inside
+interface Serial0/3/0
+ ip nat inside
+end
+write memory
+```
+
+### Bukti Pengujian
+1. **Ping ke Server Internet 8.8.8.8 dari Router Privat (R-BARAT):**
+   ![Ping Internet R-BARAT](assets/JARKOM_MID_5_ping_internet_R-BARAT.png)
+2. **Tabel Translasi NAT di R-PUSAT (`show ip nat translations`):**
+   ![NAT Translations](assets/JARKOM_MID_5_show_ip_nat_translations.png)
+3. **Pemeriksaan Tabel Routing R-ISP (Bersih dari Blok Privat):**
+   ![Routing R-ISP](assets/JARKOM_MID_5_show_ip_route_R-ISP.png)
+
+---
 
 ## Soal 6 – Tunnel GRE
 
-_Belum dikerjakan._
+> Dikerjakan oleh: Ronnin Raditya Putra Partono (5027251119) & Muhammad Rifqi Fathurrahman  
+> File: [`artefacts/K2_CIDR.pkt`](artefacts/K2_CIDR.pkt) · Script: [`perquest-scripts/soal6/`](perquest-scripts/soal6/)
+
+### Penjelasan Desain
+1. **Konstruksi Tunnel:** Dibangun interface virtual `Tunnel0` antara `R-PUSAT` dan `R-PELABUHAN` dengan alokasi IP `192.168.2.0/30` (R-PUSAT `.1`, R-PELABUHAN `.2`).
+2. **Alasan Pemilihan Jalur Tunnel:** Rute ke subnet Balai Kota (`10.17.0.0/21` dan `10.17.8.0/27`) serta Pelabuhan (`10.18.64.0/19` dan `10.18.96.0/25`) diarahkan spesifik melalui next-hop tunnel. Berdasarkan aturan *Longest Prefix Match (LPM)*, router memprioritaskan prefix yang lebih spesifik ini dibanding default route / supernet biasa.
+3. **Mengapa GRE Membutuhkan IPsec?** Protokol GRE secara bawaan hanya melakukan enkapsulasi paket tanpa mekanisme enkripsi (payload dilewatkan dalam bentuk *cleartext*). Untuk mengamankan data rahasia maritim & SCADA, diterapkan enkripsi **IPsec (AES-256 + SHA pre-shared key)** sebagai perlindungan (*tunnel protection ipsec profile*) (Bonus +5).
+
+### Script Konfigurasi
+* **R-PUSAT** (`perquest-scripts/soal6/R-PUSAT.txt`):
+```text
+enable
+configure terminal
+interface Tunnel0
+ description GRE-Tunnel-ke-R-PELABUHAN
+ ip address 192.168.2.1 255.255.255.252
+ tunnel source Serial0/2/0
+ tunnel destination 10.18.96.130
+exit
+ip route 10.18.64.0 255.255.224.0 192.168.2.2
+ip route 10.18.96.0 255.255.255.128 192.168.2.2
+crypto isakmp policy 10
+ encr aes
+ hash sha
+ authentication pre-share
+ group 2
+exit
+crypto isakmp key jarkom123 address 10.18.96.130
+crypto ipsec transform-set TS esp-aes esp-sha-hmac
+exit
+crypto ipsec profile IPSEC-TUNNEL
+ set transform-set TS
+exit
+interface Tunnel0
+ tunnel protection ipsec profile IPSEC-TUNNEL
+end
+write memory
+```
+
+* **R-PELABUHAN** (`perquest-scripts/soal6/R-PELABUHAN.txt`):
+```text
+enable
+configure terminal
+interface Tunnel0
+ description GRE-Tunnel-ke-R-PUSAT
+ ip address 192.168.2.2 255.255.255.252
+ tunnel source Serial0/3/0
+ tunnel destination 10.18.130.1
+exit
+ip route 10.17.0.0 255.255.248.0 192.168.2.1
+ip route 10.17.8.0 255.255.255.224 192.168.2.1
+crypto isakmp policy 10
+ encr aes
+ hash sha
+ authentication pre-share
+ group 2
+exit
+crypto isakmp key jarkom123 address 10.18.130.1
+crypto ipsec transform-set TS esp-aes esp-sha-hmac
+exit
+crypto ipsec profile IPSEC-TUNNEL
+ set transform-set TS
+exit
+interface Tunnel0
+ tunnel protection ipsec profile IPSEC-TUNNEL
+end
+write memory
+```
+
+### Bukti Pengujian
+Traceroute membuktikan bahwa lalu lintas langsung melintasi tunnel `192.168.2.2`:
+![Traceroute via Tunnel](assets/JARKOM_MID_6_traceroute_lewat_tunnel.png)
+
+---
 
 ## Soal 7 – Dynamic Routing OSPF
 
-_Belum dikerjakan._
+> Dikerjakan oleh: Muhammad Rifqi Fathurrahman (5027251029)  
+> File: [`artefacts/K2_CIDR_OSPF.pkt`](artefacts/K2_CIDR_OSPF.pkt) · Script: [`perquest-scripts/soal7/`](perquest-scripts/soal7/)
+
+### Penjelasan Desain
+1. **Link Cadangan L7:** Ditambahkan link point-to-point baru antara `R-DC` (`Gig0/2`: `10.16.33.5/30`) dan `R-UTARA` (`Gig0/2`: `10.16.33.6/30`) menggunakan network baru `10.16.33.4/30`.
+2. **Migrasi ke OSPF Area 0:** Seluruh static route antar-router dihapus dan diganti protokol OSPF Area 0.
+3. **Passive-Interface:** Seluruh interface arah LAN pengguna disetel `passive-interface` agar pesan OSPF Hello tidak membebani link lokal warga dan menjaga keamanan jaringan.
+4. **Distribusi Default Route Otomatis:** Perintah `default-information originate always` dipasang di `R-PUSAT`, sehingga seluruh router secara otomatis menerima default route internet (`O*E2 0.0.0.0/0`).
+5. **Failover Otomatis:** Saat link backbone utama L2 putus, protokol OSPF secara otomatis mengalihkan rute melalui jalur cadangan L7 (`R-UTARA` $ightarrow$ `R-DC` $ightarrow$ `R-PUSAT`).
+
+### Script Konfigurasi
+Script lengkap per router tersedia di [`perquest-scripts/soal7/`](perquest-scripts/soal7/).  
+Contoh pada **R-PUSAT** (`perquest-scripts/soal7/R-PUSAT.txt`):
+```text
+enable
+configure terminal
+router ospf 1
+ router-id 7.7.7.7
+ default-information originate always
+ network 10.17.0.0 0.0.7.255 area 0
+ network 10.17.8.0 0.0.0.31 area 0
+ network 10.16.33.0 0.0.0.3 area 0
+ network 10.16.97.0 0.0.0.3 area 0
+ network 10.16.164.0 0.0.0.3 area 0
+ network 10.16.224.128 0.0.0.3 area 0
+ network 10.18.130.0 0.0.0.3 area 0
+ passive-interface GigabitEthernet0/1
+ passive-interface GigabitEthernet0/2
+end
+write memory
+```
+
+### Bukti Pengujian
+1. **Daftar Tetangga OSPF R-PUSAT (FULL Adjacency):**
+   ![OSPF Neighbors R-PUSAT](assets/JARKOM_MID_7_ospf_neighbors_R-PUSAT.png)
+2. **Penerimaan Default Route Otomatis di R-PELABUHAN (`show ip route ospf`):**
+   ![OSPF Route Default](assets/JARKOM_MID_7_show_ip_route_ospf_default.png)
+3. **Traceroute Kondisi Normal (Melalui Link L2 `10.18.130.1`):**
+   ![Traceroute Normal](assets/JARKOM_MID_7_traceroute_sebelum_putus.png)
+4. **Traceroute Kondisi Failover (Link L2 Putus, Otomatis Beralih ke L7 `10.16.33.5` via R-DC):**
+   ![Traceroute Failover L7](assets/JARKOM_MID_7_failover_lewat_L7.png)
+
+---
 
 ## Soal 8 – Layanan Aplikasi Smart City
 
-_Belum dikerjakan._
+> Dikerjakan oleh: Ronnin Raditya Putra Partono (5027251119) & Muhammad Rifqi Fathurrahman  
+> File: [`artefacts/K2_CIDR.pkt`](artefacts/K2_CIDR.pkt) · Script: [`perquest-scripts/soal8/`](perquest-scripts/soal8/)
+
+Menggunakan domain internal: **`k2.smartcity.lab`**.
+
+### A. Layanan DNS Server (`SRV-DC` - `10.16.32.2`)
+Dikonfigurasi DNS A-Record yang memetakan:
+* `www.k2.smartcity.lab` $ightarrow$ `10.17.8.2` (Server Balai Kota)
+* `ftp.k2.smartcity.lab` $ightarrow$ `10.16.32.2` (Server & Storage DC)
+* `mail.k2.smartcity.lab` $ightarrow$ `10.16.32.2` (Server & Storage DC)
+
+### B. Web Server Portal Smart City (`SRV-BALAIKOTA` - `10.17.8.2`)
+Halaman web portal resmi kota Surabaya dengan judul *"Portal Smart City Surabaya"* dan mencantumkan *"Kelompok 2 (K2)"*, berhasil diakses dari seluruh komputer wilayah menggunakan URL `http://www.k2.smartcity.lab`.
+![Web Portal Smart City](assets/JARKOM_MID_8_web_portal_k2_smartcity_lab.png)
+
+### C. FTP Server Penyimpanan Rekaman CCTV (`SRV-DC` - `10.16.32.2`)
+Layanan FTP aktif dengan akun `cctv` / `cctv123` (izin Write/Read/Delete/Rename/List). Komputer `PC-CCTV-KOTA` berhasil login menggunakan perintah `ftp ftp.k2.smartcity.lab`.
+![FTP Login CCTV](assets/JARKOM_MID_8_ftp_login_cctv.png)
+
+### D. Email Antarpegawai Balai Kota dan Pelabuhan (`SRV-DC` - `10.16.32.2`)
+Layanan SMTP dan POP3 aktif pada domain `k2.smartcity.lab`:
+* Komputer Balai Kota (`pegawai@k2.smartcity.lab`) berhasil mengirim email ke Pelabuhan (`pelabuhan@k2.smartcity.lab`).
+* Komputer Pelabuhan berhasil menerima email (*Receive Mail Success*) dan membaca pesan di kotak masuk.
+![Email Diterima Pelabuhan](assets/JARKOM_MID_8_email_sukses_diterima.png)
+
+---
+
+## Bukti Pengujian End-to-End Jaringan
+Pengujian menyeluruh dari komputer terjauh (`PC-SCADA-PELABUHAN`) membuktikan seluruh konektivitas ke gateway, internet luar 8.8.8.8, Server Balai Kota, dan Server DC berjalan sukses 100%.
+![Uji End-to-End](assets/JARKOM_MID_uji_end_to_end_PC-SCADA.png)

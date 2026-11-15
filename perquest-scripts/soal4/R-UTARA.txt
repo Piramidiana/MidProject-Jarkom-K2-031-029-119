@@ -1,0 +1,14 @@
+enable
+configure terminal
+ip dhcp excluded-address 10.18.0.1
+ip dhcp excluded-address 10.18.128.1
+ip dhcp pool POOL-WIFI-UTARA
+ network 10.18.0.0 255.255.192.0
+ default-router 10.18.0.1
+ dns-server 10.16.32.2
+ip dhcp pool POOL-SENSOR-UTARA
+ network 10.18.128.0 255.255.254.0
+ default-router 10.18.128.1
+ dns-server 10.16.32.2
+end
+write memory

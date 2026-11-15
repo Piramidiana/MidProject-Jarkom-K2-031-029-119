@@ -1,0 +1,12 @@
+enable
+configure terminal
+no ip route 0.0.0.0 0.0.0.0 10.16.164.1
+router ospf 1
+ router-id 3.3.3.3
+ network 10.16.128.0 0.0.31.255 area 0
+ network 10.16.160.0 0.0.3.255 area 0
+ network 10.16.164.0 0.0.0.3 area 0
+ passive-interface GigabitEthernet0/0
+ passive-interface GigabitEthernet0/1
+end
+write memory

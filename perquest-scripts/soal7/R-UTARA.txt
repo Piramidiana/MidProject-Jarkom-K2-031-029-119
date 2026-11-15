@@ -1,0 +1,20 @@
+enable
+configure terminal
+interface GigabitEthernet0/2
+ description Link-L7-Cadangan-ke-R-DC
+ ip address 10.16.33.6 255.255.255.252
+ no shutdown
+exit
+no ip route 0.0.0.0 0.0.0.0 10.18.130.1
+no ip route 10.18.64.0 255.255.192.0 10.18.96.130
+router ospf 1
+ router-id 6.6.6.6
+ network 10.18.0.0 0.0.63.255 area 0
+ network 10.18.128.0 0.0.1.255 area 0
+ network 10.18.130.0 0.0.0.3 area 0
+ network 10.18.96.128 0.0.0.3 area 0
+ network 10.16.33.4 0.0.0.3 area 0
+ passive-interface GigabitEthernet0/0
+ passive-interface GigabitEthernet0/1
+end
+write memory

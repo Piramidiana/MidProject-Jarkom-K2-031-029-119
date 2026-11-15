@@ -1,0 +1,16 @@
+# Konfigurasi Layanan di SRV-DC (10.16.32.2)
+
+1. DNS Server (Tab Services -> DNS -> Service: On)
+   - A Record: www.k2.smartcity.lab  -> 10.17.8.2
+   - A Record: ftp.k2.smartcity.lab  -> 10.16.32.2
+   - A Record: mail.k2.smartcity.lab -> 10.16.32.2
+
+2. FTP Server (Tab Services -> FTP -> Service: On)
+   - User: cctv
+   - Password: cctv123
+   - Permissions: Write, Read, Delete, Rename, List
+
+3. Email Server (Tab Services -> EMAIL -> SMTP: On, POP3: On)
+   - Domain Name: k2.smartcity.lab (Click Set)
+   - User 1: pegawai / password123
+   - User 2: pelabuhan / password123

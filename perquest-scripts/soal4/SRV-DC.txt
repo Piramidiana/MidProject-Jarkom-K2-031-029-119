@@ -1,0 +1,7 @@
+# Konfigurasi Layanan DHCP CCTV di Server DC (SRV-DC)
+Tab Services -> DHCP -> Service: On
+- Pool Name: POOL-CCTV
+- Default Gateway: 10.16.0.1
+- DNS Server: 10.16.32.2
+- Start IP Address: 10.16.0.2
+- Subnet Mask: 255.255.224.0

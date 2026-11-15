@@ -1,0 +1,21 @@
+enable
+configure terminal
+no ip route 10.16.0.0 255.255.192.0 10.16.33.2
+no ip route 10.16.64.0 255.255.192.0 10.16.97.2
+no ip route 10.16.128.0 255.255.192.0 10.16.164.2
+no ip route 10.16.192.0 255.255.192.0 10.16.224.130
+no ip route 10.18.0.0 255.255.0.0 10.18.130.2
+router ospf 1
+ router-id 7.7.7.7
+ default-information originate always
+ network 10.17.0.0 0.0.7.255 area 0
+ network 10.17.8.0 0.0.0.31 area 0
+ network 10.16.33.0 0.0.0.3 area 0
+ network 10.16.97.0 0.0.0.3 area 0
+ network 10.16.164.0 0.0.0.3 area 0
+ network 10.16.224.128 0.0.0.3 area 0
+ network 10.18.130.0 0.0.0.3 area 0
+ passive-interface GigabitEthernet0/1
+ passive-interface GigabitEthernet0/2
+end
+write memory

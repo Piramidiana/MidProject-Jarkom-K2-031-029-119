@@ -1,0 +1,9 @@
+enable
+configure terminal
+ip dhcp excluded-address 10.17.0.1
+ip dhcp pool POOL-PEGAWAI-BK
+ network 10.17.0.0 255.255.248.0
+ default-router 10.17.0.1
+ dns-server 10.16.32.2
+end
+write memory

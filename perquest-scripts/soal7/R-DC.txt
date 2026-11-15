@@ -1,0 +1,18 @@
+enable
+configure terminal
+interface GigabitEthernet0/2
+ description Link-L7-Cadangan-ke-R-UTARA
+ ip address 10.16.33.5 255.255.255.252
+ no shutdown
+exit
+no ip route 0.0.0.0 0.0.0.0 10.16.33.1
+router ospf 1
+ router-id 1.1.1.1
+ network 10.16.0.0 0.0.31.255 area 0
+ network 10.16.32.0 0.0.0.255 area 0
+ network 10.16.33.0 0.0.0.3 area 0
+ network 10.16.33.4 0.0.0.3 area 0
+ passive-interface GigabitEthernet0/0
+ passive-interface GigabitEthernet0/1
+end
+write memory

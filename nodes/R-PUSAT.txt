@@ -1,0 +1,80 @@
+hostname R-PUSAT
+!
+interface GigabitEthernet0/0
+ description Link-ISP
+ ip address 203.0.113.10 255.255.255.252
+ ip nat outside
+ no shutdown
+!
+interface GigabitEthernet0/1
+ description LAN-Pegawai-Balai-Kota
+ ip address 10.17.0.1 255.255.248.0
+ ip nat inside
+ no shutdown
+!
+interface GigabitEthernet0/2
+ description LAN-Server-Balai-Kota
+ ip address 10.17.8.1 255.255.255.224
+ ip nat inside
+ no shutdown
+!
+interface Serial0/1/0
+ description L1-ke-R-DC
+ ip address 10.16.33.1 255.255.255.252
+ ip nat inside
+ no shutdown
+!
+interface Serial0/1/1
+ description L5-ke-R-BARAT
+ ip address 10.16.97.1 255.255.255.252
+ ip nat inside
+ no shutdown
+!
+interface Serial0/2/0
+ description L2-ke-R-UTARA
+ ip address 10.18.130.1 255.255.255.252
+ ip nat inside
+ no shutdown
+!
+interface Serial0/2/1
+ description L4-ke-R-TIMUR
+ ip address 10.16.164.1 255.255.255.252
+ ip nat inside
+ no shutdown
+!
+interface Serial0/3/0
+ description L3-ke-R-SELATAN
+ ip address 10.16.224.129 255.255.255.252
+ ip nat inside
+ no shutdown
+!
+interface Tunnel0
+ description GRE-Tunnel-ke-R-PELABUHAN
+ ip address 192.168.2.1 255.255.255.252
+ tunnel source Serial0/2/0
+ tunnel destination 10.18.96.130
+ tunnel protection ipsec profile IPSEC-TUNNEL
+!
+ip dhcp excluded-address 10.17.0.1
+ip dhcp pool POOL-PEGAWAI-BK
+ network 10.17.0.0 255.255.248.0
+ default-router 10.17.0.1
+ dns-server 10.16.32.2
+!
+ip route 0.0.0.0 0.0.0.0 203.0.113.9
+ip route 10.18.64.0 255.255.224.0 192.168.2.2
+ip route 10.18.96.0 255.255.255.128 192.168.2.2
+!
+access-list 1 permit 10.16.0.0 0.3.255.255
+access-list 1 permit 10.0.0.0 0.255.255.255
+ip nat inside source list 1 interface GigabitEthernet0/0 overload
+!
+crypto isakmp policy 10
+ encr aes
+ hash sha
+ authentication pre-share
+ group 2
+crypto isakmp key jarkom123 address 10.18.96.130
+crypto ipsec transform-set TS esp-aes esp-sha-hmac
+crypto ipsec profile IPSEC-TUNNEL
+ set transform-set TS

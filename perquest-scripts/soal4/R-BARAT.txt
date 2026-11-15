@@ -1,0 +1,14 @@
+enable
+configure terminal
+ip dhcp excluded-address 10.16.64.1
+ip dhcp excluded-address 10.16.96.1
+ip dhcp pool POOL-WIFI-BARAT
+ network 10.16.64.0 255.255.224.0
+ default-router 10.16.64.1
+ dns-server 10.16.32.2
+ip dhcp pool POOL-PUSKESMAS
+ network 10.16.96.0 255.255.255.0
+ default-router 10.16.96.1
+ dns-server 10.16.32.2
+end
+write memory

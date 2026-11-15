@@ -1,0 +1,11 @@
+# Konfigurasi Web Server di SRV-BALAIKOTA (10.17.8.2)
+Tab Services -> HTTP -> HTTP: On, HTTPS: On
+Edit index.html:
+<html>
+<head><title>Portal Smart City Surabaya</title></head>
+<body style="font-family: Arial; text-align: center; margin-top: 50px;">
+  <h1>Portal Smart City Surabaya</h1>
+  <h2>Mid-Project Jarkom - Kelompok 2 (K2)</h2>
+  <p>Selamat datang di Portal Layanan Terpadu Pemerintah Kota Surabaya.</p>
+</body>
+</html>
