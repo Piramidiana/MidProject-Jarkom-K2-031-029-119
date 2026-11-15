@@ -638,4 +638,4 @@ Pengujian menyeluruh dari komputer terjauh (`PC-SCADA-PELABUHAN`) membuktikan se
 
 # Video Demo Kelompok-2
 
-https://youtu.be/kg_r4tnNPxY
+https://youtu.be/OwHjCY5kUr8
